@@ -378,11 +378,14 @@ export default function Home({ onNavigate }) {
             <span>VoceNexus AI • Engineered for Fortivex Solutions</span>
           </div>
 
-          {/* Bottom Navigation Links (Vertical) */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', fontSize: '13px', marginTop: '4px' }}>
+          {/* Bottom Navigation Links (Classic Vertical Bullet List) */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', marginTop: '6px' }}>
             <button
               onClick={() => onNavigate('home')}
               style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
                 background: 'none',
                 border: 'none',
                 color: 'var(--accent-cyan)',
@@ -393,12 +396,16 @@ export default function Home({ onNavigate }) {
                 width: 'fit-content'
               }}
             >
-              Home
+              <span style={{ color: 'var(--accent-cyan)', fontSize: '15px', lineHeight: '1' }}>•</span>
+              <span>Home</span>
             </button>
-            <span style={{ color: 'var(--text-muted)', fontSize: '11px', lineHeight: '1' }}>•</span>
+
             <button
               onClick={() => onNavigate('call')}
               style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
                 background: 'none',
                 border: 'none',
                 color: 'var(--text-secondary)',
@@ -409,15 +416,19 @@ export default function Home({ onNavigate }) {
                 width: 'fit-content',
                 transition: 'color 0.2s ease'
               }}
-              onMouseEnter={(e) => e.target.style.color = '#fff'}
-              onMouseLeave={(e) => e.target.style.color = 'var(--text-secondary)'}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#fff'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
             >
-              Voice Call
+              <span style={{ color: 'var(--text-muted)', fontSize: '15px', lineHeight: '1' }}>•</span>
+              <span>Voice Call</span>
             </button>
-            <span style={{ color: 'var(--text-muted)', fontSize: '11px', lineHeight: '1' }}>•</span>
+
             <button
               onClick={() => onNavigate('dashboard')}
               style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
                 background: 'none',
                 border: 'none',
                 color: 'var(--text-secondary)',
@@ -428,10 +439,11 @@ export default function Home({ onNavigate }) {
                 width: 'fit-content',
                 transition: 'color 0.2s ease'
               }}
-              onMouseEnter={(e) => e.target.style.color = '#fff'}
-              onMouseLeave={(e) => e.target.style.color = 'var(--text-secondary)'}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#fff'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
             >
-              CRM & Analytics
+              <span style={{ color: 'var(--text-muted)', fontSize: '15px', lineHeight: '1' }}>•</span>
+              <span>CRM & Analytics</span>
             </button>
           </div>
         </div>
