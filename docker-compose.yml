@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vocenexus-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - DATABASE_URL=sqlite:///./voicenexus.db
+    volumes:
+      - ./backend/voicenexus.db:/app/voicenexus.db
+      - ./backend/knowledge_base/faiss_index:/app/knowledge_base/faiss_index
+    restart: unless-stopped
+    networks:
+      - vocenexus-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: vocenexus-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - vocenexus-network
+
+networks:
+  vocenexus-network:
+    driver: bridge
