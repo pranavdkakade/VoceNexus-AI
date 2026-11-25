@@ -1,0 +1,66 @@
+# FORTIVEX SOLUTIONS — ENTERPRISE COMPANY KNOWLEDGE BASE
+
+## 1. ABOUT FORTIVEX SOLUTIONS
+Fortivex Solutions is a next-generation AI infrastructure and Go-To-Market (GTM) agent company. We build autonomous voice and text AI agents designed to handle inbound sales inquiries, customer support operations, appointment booking, and CRM synchronization for B2B SaaS, e-commerce, and high-growth enterprises.
+
+## 2. CORE PRODUCTS & SOLUTIONS
+
+### A. Fortivex VoiceNexus (Autonomous AI Sales Voice Agent)
+- Real-time conversational voice agent that qualifies leads, handles objections, and schedules demos.
+- Sub-second conversational latency powered by Groq LPU inference.
+- Multi-channel capabilities: Browser Web Speech, WebRTC, and telephony integration (Twilio / SIP trunking).
+- Out-of-the-box integrations with Salesforce, HubSpot, Zoho CRM, Pipedrive, and Slack.
+
+### B. Fortivex SupportMesh (24/7 Omnichannel Customer Support Agent)
+- Resolves Tier 1 and Tier 2 tickets autonomously across voice, email, and live chat.
+- Capable of issuing refunds, checking order and tracking status, modifying reservations, and managing returns.
+- Connects directly into Shopify, WooCommerce, Zendesk, Intercom, and Gorgias.
+- Deflects up to 78% of routine support inquiries without human escalation.
+
+### C. Fortivex GTM Pipeline Orchestrator
+- Intelligent lead scoring and intent recognition engine.
+- Automatically analyzes buyer urgency, budget indicators, and technical fit during every conversation.
+- Triggers instant Slack and email notifications to account executives when hot enterprise leads are identified.
+
+## 3. PRICING & SUBSCRIPTION TIERS
+
+### Starter Tier ($499 / month)
+- Up to 1,500 active voice conversation minutes per month.
+- 1 AI Sales Voice Agent + 1 Knowledge Base instance.
+- Standard CRM integrations (HubSpot, Zoho).
+- Email and community support (12-hour SLA).
+- Best for early-stage startups and small businesses.
+
+### Growth Tier ($1,499 / month) — MOST POPULAR
+- Up to 6,000 active voice conversation minutes per month.
+- Up to 3 AI Voice & Support Agents with custom personality fine-tuning.
+- Advanced RAG indexing with auto-sync from Notion, Google Docs, and website URLs.
+- Lead scoring engine, sentiment analysis, and calendar booking integration (Calendly, Google Calendar, Outlook).
+- Priority Slack support (4-hour SLA).
+
+### Enterprise Tier (Custom Pricing — starting at $4,500 / month)
+- Unlimited or high-volume dedicated voice minutes with burst capacity.
+- Custom LLM fine-tuning, private cloud / on-premise deployment options.
+- Dedicated Customer Success Manager and Solutions Engineer.
+- 99.99% uptime SLA, SOC2 Type II compliance, HIPAA compliance, and GDPR adherence.
+- Custom telephony architecture and dedicated phone numbers in 50+ countries.
+
+## 4. SECURITY, DATA PRIVACY & COMPLIANCE
+- All data in transit is encrypted using TLS 1.3; data at rest is encrypted via AES-256.
+- Zero data retention policies available for enterprise healthcare and fintech customers.
+- SOC2 Type II certified and GDPR compliant.
+- Role-Based Access Control (RBAC) and Single Sign-On (SSO / SAML Okta).
+
+## 5. FREQUENTLY ASKED QUESTIONS (FAQ)
+
+### How fast can we deploy a Fortivex AI Voice Agent?
+Typically, customers can ingest their knowledge documents and go live in less than 48 hours. Enterprise rollouts with custom telephony and ERP integrations take 1 to 2 weeks.
+
+### Can the agent book meetings directly onto our sales reps' calendars?
+Yes! Fortivex seamlessly integrates with Google Calendar, Microsoft Outlook 365, and Calendly to check real-time availability and lock in demo slots without double-booking.
+
+### What happens if the customer has an unusual or angry query?
+Our built-in sentiment analysis engine detects customer dissatisfaction, hesitation, or complex unhandled requests and immediately initiates a graceful human-in-the-loop handoff.
+
+### What languages are supported?
+English is natively optimized for ultra-low latency. Multilingual support includes Spanish, French, German, Hindi, and Arabic.
