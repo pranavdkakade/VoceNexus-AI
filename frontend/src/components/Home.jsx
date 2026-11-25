@@ -378,8 +378,8 @@ export default function Home({ onNavigate }) {
             <span>VoceNexus AI • Engineered for Fortivex Solutions</span>
           </div>
 
-          {/* Bottom Navigation Links */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '18px', fontSize: '13px' }}>
+          {/* Bottom Navigation Links (Vertical) */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', fontSize: '13px', marginTop: '4px' }}>
             <button
               onClick={() => onNavigate('home')}
               style={{
@@ -389,12 +389,13 @@ export default function Home({ onNavigate }) {
                 cursor: 'pointer',
                 padding: '0',
                 fontWeight: 600,
-                transition: 'color 0.2s ease'
+                textAlign: 'left',
+                width: 'fit-content'
               }}
             >
               Home
             </button>
-            <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>•</span>
+            <span style={{ color: 'var(--text-muted)', fontSize: '11px', lineHeight: '1' }}>•</span>
             <button
               onClick={() => onNavigate('call')}
               style={{
@@ -404,6 +405,8 @@ export default function Home({ onNavigate }) {
                 cursor: 'pointer',
                 padding: '0',
                 fontWeight: 500,
+                textAlign: 'left',
+                width: 'fit-content',
                 transition: 'color 0.2s ease'
               }}
               onMouseEnter={(e) => e.target.style.color = '#fff'}
@@ -411,7 +414,7 @@ export default function Home({ onNavigate }) {
             >
               Voice Call
             </button>
-            <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>•</span>
+            <span style={{ color: 'var(--text-muted)', fontSize: '11px', lineHeight: '1' }}>•</span>
             <button
               onClick={() => onNavigate('dashboard')}
               style={{
@@ -421,6 +424,8 @@ export default function Home({ onNavigate }) {
                 cursor: 'pointer',
                 padding: '0',
                 fontWeight: 500,
+                textAlign: 'left',
+                width: 'fit-content',
                 transition: 'color 0.2s ease'
               }}
               onMouseEnter={(e) => e.target.style.color = '#fff'}
