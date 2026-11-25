@@ -8,8 +8,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import os
 
+from app.database.connection import engine, Base
+from app.database.models import Customer, Lead, Conversation, Message, Appointment, CallSummary
+
 # Load environment variables
 load_dotenv()
+
+# Automatically create database tables
+Base.metadata.create_all(bind=engine)
 
 # Create FastAPI app
 app = FastAPI(
@@ -25,6 +31,7 @@ app.add_middleware(
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://localhost:3000",
+        "*",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -54,7 +61,13 @@ async def api_health():
     }
 
 
-# ---------- Import and register routers ----------
+# ---------- Register Routers ----------
 from app.api.voice import router as voice_router
+from app.api.leads import router as leads_router
+from app.api.appointments import router as appointments_router
+from app.api.analytics import router as analytics_router
 
 app.include_router(voice_router)
+app.include_router(leads_router)
+app.include_router(appointments_router)
+app.include_router(analytics_router)
