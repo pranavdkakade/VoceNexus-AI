@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import VoiceAgent from './components/VoiceAgent';
-import { Bot, Radio, Cpu, Database, BarChart3, HelpCircle } from 'lucide-react';
+import Dashboard from './components/Dashboard';
+import { Bot, Radio, BarChart3 } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('call');
 
   return (
-    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '24px 28px', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '24px 28px', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Top Navbar */}
       <header style={{
         display: 'flex',
@@ -60,13 +61,13 @@ export default function App() {
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              padding: '8px 16px',
+              padding: '8px 18px',
               borderRadius: '8px',
               border: 'none',
               background: activeTab === 'call' ? 'rgba(99, 102, 241, 0.25)' : 'transparent',
               color: activeTab === 'call' ? '#fff' : 'var(--text-secondary)',
               cursor: 'pointer',
-              fontSize: '13px',
+              fontSize: '13.5px',
               fontWeight: 600,
               transition: 'all 0.2s ease'
             }}
@@ -81,13 +82,13 @@ export default function App() {
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              padding: '8px 16px',
+              padding: '8px 18px',
               borderRadius: '8px',
               border: 'none',
               background: activeTab === 'dashboard' ? 'rgba(99, 102, 241, 0.25)' : 'transparent',
               color: activeTab === 'dashboard' ? '#fff' : 'var(--text-secondary)',
               cursor: 'pointer',
-              fontSize: '13px',
+              fontSize: '13.5px',
               fontWeight: 600,
               transition: 'all 0.2s ease'
             }}
@@ -100,17 +101,7 @@ export default function App() {
 
       {/* Main View Area */}
       <main style={{ flex: 1 }}>
-        {activeTab === 'call' ? (
-          <VoiceAgent />
-        ) : (
-          <div className="glass-panel" style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-            <Database size={48} color="var(--accent-purple)" style={{ marginBottom: '16px' }} />
-            <h2 style={{ color: '#fff', fontSize: '20px', marginBottom: '8px' }}>CRM & Analytics Dashboard</h2>
-            <p style={{ maxWidth: '600px', margin: '0 auto', fontSize: '14px', lineHeight: '1.6' }}>
-              Shows qualified leads, scheduled demos, sentiment metrics, and automated call summaries. (Built in Phase 3!)
-            </p>
-          </div>
-        )}
+        {activeTab === 'call' ? <VoiceAgent /> : <Dashboard />}
       </main>
     </div>
   );
