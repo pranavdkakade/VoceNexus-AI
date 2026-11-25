@@ -350,22 +350,107 @@ export default function Home({ onNavigate }) {
         </div>
       </section>
 
-      {/* Professional Footer */}
+      {/* Professional Developer Footer */}
       <footer style={{
         borderTop: '1px solid var(--border-color)',
-        paddingTop: '24px',
+        paddingTop: '32px',
+        marginTop: '20px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        fontSize: '12.5px',
-        color: 'var(--text-muted)'
+        flexWrap: 'wrap',
+        gap: '24px'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Bot size={16} color="var(--accent-purple)" />
-          <span>VoceNexus AI • Engineered for Fortivex Solutions</span>
+        {/* Left Side: Brand + Interactive Navigation */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '9px', fontSize: '13.5px', fontWeight: 600, color: '#f8fafc' }}>
+            <div style={{
+              width: '26px',
+              height: '26px',
+              borderRadius: '7px',
+              background: 'linear-gradient(135deg, #6366f1, #06b6d4)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Bot size={15} color="#fff" />
+            </div>
+            <span>VoceNexus AI • Engineered for Fortivex Solutions</span>
+          </div>
+
+          {/* Bottom Navigation Links */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '18px', fontSize: '13px' }}>
+            <button
+              onClick={() => onNavigate('home')}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--accent-cyan)',
+                cursor: 'pointer',
+                padding: '0',
+                fontWeight: 600,
+                transition: 'color 0.2s ease'
+              }}
+            >
+              Home
+            </button>
+            <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>•</span>
+            <button
+              onClick={() => onNavigate('call')}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-secondary)',
+                cursor: 'pointer',
+                padding: '0',
+                fontWeight: 500,
+                transition: 'color 0.2s ease'
+              }}
+              onMouseEnter={(e) => e.target.style.color = '#fff'}
+              onMouseLeave={(e) => e.target.style.color = 'var(--text-secondary)'}
+            >
+              Voice Call
+            </button>
+            <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>•</span>
+            <button
+              onClick={() => onNavigate('dashboard')}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-secondary)',
+                cursor: 'pointer',
+                padding: '0',
+                fontWeight: 500,
+                transition: 'color 0.2s ease'
+              }}
+              onMouseEnter={(e) => e.target.style.color = '#fff'}
+              onMouseLeave={(e) => e.target.style.color = 'var(--text-secondary)'}
+            >
+              CRM & Analytics
+            </button>
+          </div>
         </div>
-        <div>
-          FastAPI • Groq LPU • LangChain • FAISS • React + Vite
+
+        {/* Right Side: Developer Attribution & Tech Stack */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Developed by</span>
+            <span style={{
+              fontSize: '13.5px',
+              fontWeight: 700,
+              color: '#f8fafc',
+              background: 'rgba(255, 255, 255, 0.06)',
+              padding: '3px 10px',
+              borderRadius: '20px',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              letterSpacing: '0.2px'
+            }}>
+              Pranav Kakade
+            </span>
+          </div>
+          <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
+            FastAPI • Groq LPU • LangChain • FAISS • React + Vite
+          </div>
         </div>
       </footer>
     </div>
