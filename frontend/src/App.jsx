@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import Home from './components/Home';
 import VoiceAgent from './components/VoiceAgent';
 import Dashboard from './components/Dashboard';
-import { Bot, Radio, BarChart3 } from 'lucide-react';
+import { Bot, Radio, BarChart3, Home as HomeIcon } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('call');
+  const [activeTab, setActiveTab] = useState('home');
 
   return (
     <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '24px 28px', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -17,7 +18,10 @@ export default function App() {
         marginBottom: '20px',
         borderBottom: '1px solid var(--border-color)'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+        <div 
+          onClick={() => setActiveTab('home')}
+          style={{ display: 'flex', alignItems: 'center', gap: '14px', cursor: 'pointer' }}
+        >
           <div style={{
             width: '42px',
             height: '42px',
@@ -53,8 +57,29 @@ export default function App() {
           </div>
         </div>
 
-        {/* Navigation Tabs */}
+        {/* Navigation Tabs: Home, Voice Call, CRM & Analytics */}
         <div style={{ display: 'flex', gap: '8px', background: 'rgba(15, 23, 42, 0.6)', padding: '4px', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+          <button
+            onClick={() => setActiveTab('home')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '8px 18px',
+              borderRadius: '8px',
+              border: 'none',
+              background: activeTab === 'home' ? 'rgba(99, 102, 241, 0.25)' : 'transparent',
+              color: activeTab === 'home' ? '#fff' : 'var(--text-secondary)',
+              cursor: 'pointer',
+              fontSize: '13.5px',
+              fontWeight: 600,
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <HomeIcon size={16} />
+            Home
+          </button>
+
           <button
             onClick={() => setActiveTab('call')}
             style={{
@@ -101,7 +126,9 @@ export default function App() {
 
       {/* Main View Area */}
       <main style={{ flex: 1 }}>
-        {activeTab === 'call' ? <VoiceAgent /> : <Dashboard />}
+        {activeTab === 'home' && <Home onNavigate={(tab) => setActiveTab(tab)} />}
+        {activeTab === 'call' && <VoiceAgent />}
+        {activeTab === 'dashboard' && <Dashboard />}
       </main>
     </div>
   );
