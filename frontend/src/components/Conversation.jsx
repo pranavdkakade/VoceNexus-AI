@@ -1,15 +1,25 @@
-import React, { useEffect, useRef } from 'react';
-import { User, Bot, Sparkles } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { User, Bot, Sparkles, Send } from 'lucide-react';
 
-export default function Conversation({ messages, isListening, isSpeaking, isThinking }) {
+export default function Conversation({ messages, isListening, isSpeaking, isThinking, onSendMessage }) {
+  const [inputText, setInputText] = useState('');
   const bottomRef = useRef(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isThinking]);
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (inputText.trim() && onSendMessage) {
+      onSendMessage(inputText.trim());
+      setInputText('');
+    }
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      {/* Top Header */}
       <div style={{
         padding: '16px 20px',
         borderBottom: '1px solid var(--border-color)',
@@ -42,6 +52,7 @@ export default function Conversation({ messages, isListening, isSpeaking, isThin
         </div>
       </div>
 
+      {/* Transcript Scroll Area */}
       <div style={{
         flex: 1,
         overflowY: 'auto',
@@ -53,7 +64,7 @@ export default function Conversation({ messages, isListening, isSpeaking, isThin
         {messages.length === 0 ? (
           <div style={{ margin: 'auto', textAlign: 'center', color: 'var(--text-muted)' }}>
             <p style={{ fontSize: '15px' }}>Click "Start Voice Call" to talk with Nexus.</p>
-            <p style={{ fontSize: '13px', marginTop: '6px' }}>Speak naturally as a prospective buyer or business owner.</p>
+            <p style={{ fontSize: '13px', marginTop: '6px' }}>Speak naturally or type your requirements below.</p>
           </div>
         ) : (
           messages.map((msg, idx) => {
@@ -130,6 +141,54 @@ export default function Conversation({ messages, isListening, isSpeaking, isThin
         )}
         <div ref={bottomRef} />
       </div>
+
+      {/* Interactive Text Input Fallback Bar */}
+      <form 
+        onSubmit={handleSubmit}
+        style={{
+          padding: '14px 18px',
+          borderTop: '1px solid var(--border-color)',
+          display: 'flex',
+          gap: '10px',
+          background: 'rgba(0, 0, 0, 0.2)'
+        }}
+      >
+        <input
+          type="text"
+          value={inputText}
+          onChange={(e) => setInputText(e.target.value)}
+          placeholder="Speak into microphone or type a question..."
+          style={{
+            flex: 1,
+            background: 'rgba(255, 255, 255, 0.05)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '24px',
+            padding: '10px 18px',
+            color: '#f8fafc',
+            fontSize: '13.5px',
+            outline: 'none'
+          }}
+        />
+        <button
+          type="submit"
+          disabled={!inputText.trim()}
+          style={{
+            background: inputText.trim() ? 'linear-gradient(135deg, #6366f1, #06b6d4)' : 'rgba(255, 255, 255, 0.05)',
+            border: 'none',
+            borderRadius: '50%',
+            width: '40px',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: inputText.trim() ? '#fff' : 'var(--text-muted)',
+            cursor: inputText.trim() ? 'pointer' : 'default',
+            transition: 'all 0.2s ease'
+          }}
+        >
+          <Send size={16} />
+        </button>
+      </form>
     </div>
   );
 }

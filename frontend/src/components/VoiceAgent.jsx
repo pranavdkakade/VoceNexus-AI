@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, MicOff, PhoneCall, PhoneOff, Volume2, VolumeX, ShieldCheck, Zap, Calendar, TrendingUp, Smile, Meh, Frown } from 'lucide-react';
+import { Mic, MicOff, PhoneCall, PhoneOff, Volume2, VolumeX, ShieldCheck, Zap, Calendar, TrendingUp, Smile, Meh, Frown, Send } from 'lucide-react';
 import { voiceWs } from '../services/websocket';
 import Conversation from './Conversation';
 
@@ -20,10 +20,114 @@ export default function VoiceAgent() {
   const [sentiment, setSentiment] = useState('neutral');
   const [bookedAppointment, setBookedAppointment] = useState(null);
 
+  // Synchronous State Tracking Refs (solves React closure staleness in speech events)
+  const isCallActiveRef = useRef(false);
+  const isSpeakingRef = useRef(false);
+  const isThinkingRef = useRef(false);
   const recognitionRef = useRef(null);
   const synthesisRef = useRef(window.speechSynthesis);
 
-  // Initialize Speech Recognition
+  // Safe Recognition Starter
+  const safeStartRecognition = () => {
+    if (!isCallActiveRef.current || isSpeakingRef.current || isThinkingRef.current) return;
+    if (!recognitionRef.current) return;
+    try {
+      recognitionRef.current.start();
+    } catch (err) {
+      // Ignore if recognition is already running or active
+    }
+  };
+
+  const safeStopRecognition = () => {
+    if (!recognitionRef.current) return;
+    try {
+      recognitionRef.current.stop();
+    } catch (err) {}
+  };
+
+  // Text to Speech
+  const speakText = (text) => {
+    if (!synthesisRef.current || isMuted) {
+      // If muted, resume listening immediately
+      setTimeout(safeStartRecognition, 200);
+      return;
+    }
+
+    try {
+      synthesisRef.current.cancel(); // Stop ongoing speech
+    } catch (e) {}
+
+    // Halt speech recognition while AI speaks to avoid audio feedback
+    safeStopRecognition();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    utterance.rate = 1.05;
+    utterance.pitch = 1.0;
+
+    // Pick best available natural voice
+    const voices = synthesisRef.current.getVoices();
+    const naturalVoice = voices.find(
+      (v) => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('David'))
+    );
+    if (naturalVoice) utterance.voice = naturalVoice;
+
+    utterance.onstart = () => {
+      isSpeakingRef.current = true;
+      setIsSpeaking(true);
+      setStatusText('Nexus speaking...');
+      safeStopRecognition();
+    };
+
+    utterance.onend = () => {
+      isSpeakingRef.current = false;
+      setIsSpeaking(false);
+      setStatusText('Listening to your voice...');
+      // Give audio subsystem 250ms to release, then resume continuous listening for next question
+      setTimeout(() => {
+        if (isCallActiveRef.current && !isSpeakingRef.current) {
+          safeStartRecognition();
+        }
+      }, 250);
+    };
+
+    utterance.onerror = () => {
+      isSpeakingRef.current = false;
+      setIsSpeaking(false);
+      setTimeout(safeStartRecognition, 250);
+    };
+
+    synthesisRef.current.speak(utterance);
+  };
+
+  // Process user message (via voice or text)
+  const handleUserMessage = (userText) => {
+    if (!userText || !userText.trim()) return;
+    const text = userText.trim();
+
+    // Auto-activate call state if typed or spoken
+    if (!isCallActiveRef.current) {
+      isCallActiveRef.current = true;
+      setIsCallActive(true);
+    }
+
+    setMessages((prev) => [...prev, { role: 'user', content: text }]);
+    isThinkingRef.current = true;
+    setIsThinking(true);
+    setStatusText('Nexus is formulating sales response...');
+
+    // Pause recognition while waiting for AI response
+    safeStopRecognition();
+
+    // Send to backend via WebSocket
+    if (!voiceWs.isConnected()) {
+      voiceWs.connect();
+    }
+    voiceWs.send({ text });
+    setTranscriptInterim('');
+  };
+
+  // Initialize Speech Recognition once
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
@@ -52,14 +156,7 @@ export default function VoiceAgent() {
         setTranscriptInterim(interim);
 
         if (final.trim()) {
-          const userText = final.trim();
-          setMessages((prev) => [...prev, { role: 'user', content: userText }]);
-          setIsThinking(true);
-          setStatusText('Nexus is consulting knowledge base & scoring lead...');
-
-          // Send to backend via WebSocket
-          voiceWs.send({ text: userText });
-          setTranscriptInterim('');
+          handleUserMessage(final.trim());
         }
       };
 
@@ -67,16 +164,17 @@ export default function VoiceAgent() {
         console.warn('Speech recognition event:', event.error);
         if (event.error === 'not-allowed') {
           setStatusText('Microphone permission denied');
+        } else if (event.error === 'no-speech') {
+          // Restart on silence timeout
+          setTimeout(safeStartRecognition, 200);
         }
       };
 
       recognition.onend = () => {
         setIsListening(false);
-        // If call is still active and not speaking, restart listening
-        if (isCallActive && !isSpeaking) {
-          try {
-            recognition.start();
-          } catch (e) {}
+        // Seamlessly restart if call is still active and AI is not speaking
+        if (isCallActiveRef.current && !isSpeakingRef.current && !isThinkingRef.current) {
+          setTimeout(safeStartRecognition, 150);
         }
       };
 
@@ -93,7 +191,9 @@ export default function VoiceAgent() {
     });
     const unsubClose = () => setIsConnected(false);
     const unsubMsg = voiceWs.on('message', (data) => {
+      isThinkingRef.current = false;
       setIsThinking(false);
+
       if (data.response) {
         setMessages((prev) => [...prev, { role: 'assistant', content: data.response }]);
         speakText(data.response);
@@ -117,63 +217,16 @@ export default function VoiceAgent() {
       unsubOpen();
       unsubClose();
       unsubMsg();
-      if (recognitionRef.current) recognitionRef.current.stop();
+      safeStopRecognition();
       if (synthesisRef.current) synthesisRef.current.cancel();
     };
   }, []);
 
-  // Text to Speech
-  const speakText = (text) => {
-    if (!synthesisRef.current || isMuted) return;
-
-    synthesisRef.current.cancel(); // Stop ongoing speech
-
-    // Pause STT while AI speaks to avoid feedback echo
-    if (recognitionRef.current && isListening) {
-      try {
-        recognitionRef.current.stop();
-      } catch (e) {}
-    }
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-US';
-    utterance.rate = 1.05;
-    utterance.pitch = 1.0;
-
-    // Pick best available English voice
-    const voices = synthesisRef.current.getVoices();
-    const naturalVoice = voices.find(
-      (v) => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('David'))
-    );
-    if (naturalVoice) utterance.voice = naturalVoice;
-
-    utterance.onstart = () => {
-      setIsSpeaking(true);
-      setStatusText('Nexus speaking...');
-    };
-
-    utterance.onend = () => {
-      setIsSpeaking(false);
-      setStatusText('Listening to your voice...');
-      if (isCallActive && recognitionRef.current) {
-        try {
-          recognitionRef.current.start();
-        } catch (e) {}
-      }
-    };
-
-    utterance.onerror = () => {
-      setIsSpeaking(false);
-      if (isCallActive && recognitionRef.current) {
-        try { recognitionRef.current.start(); } catch (e) {}
-      }
-    };
-
-    synthesisRef.current.speak(utterance);
-  };
-
   // Start Call
   const startCall = () => {
+    isCallActiveRef.current = true;
+    isSpeakingRef.current = false;
+    isThinkingRef.current = false;
     setIsCallActive(true);
     setStatusText('Call in progress...');
 
@@ -181,26 +234,21 @@ export default function VoiceAgent() {
       voiceWs.connect();
     }
 
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.start();
-      } catch (e) {
-        console.warn('Recognition start error:', e);
-      }
-    }
+    setTimeout(safeStartRecognition, 100);
   };
 
   // End Call
   const endCall = () => {
+    isCallActiveRef.current = false;
+    isSpeakingRef.current = false;
+    isThinkingRef.current = false;
     setIsCallActive(false);
     setIsListening(false);
     setIsSpeaking(false);
     setIsThinking(false);
     setStatusText('Call ended');
 
-    if (recognitionRef.current) {
-      try { recognitionRef.current.stop(); } catch (e) {}
-    }
+    safeStopRecognition();
     if (synthesisRef.current) {
       synthesisRef.current.cancel();
     }
@@ -326,8 +374,18 @@ export default function VoiceAgent() {
           </div>
         )}
 
-        {/* Central Voice Visualizer Orb */}
-        <div style={{ position: 'relative', margin: '20px 0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {/* Central Voice Visualizer Orb - Clickable to Force Resume Mic */}
+        <div 
+          onClick={() => {
+            if (isCallActive) {
+              safeStartRecognition();
+            } else {
+              startCall();
+            }
+          }}
+          style={{ position: 'relative', margin: '20px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+          title={isCallActive ? "Click to toggle/resume microphone" : "Click to start call"}
+        >
           {isCallActive && (
             <>
               <div className="ring-active" style={{
@@ -377,7 +435,7 @@ export default function VoiceAgent() {
               <MicOff size={38} color="#94a3b8" />
             )}
             <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.9)', marginTop: '6px', fontWeight: 600, letterSpacing: '0.5px' }}>
-              {isCallActive ? (isSpeaking ? 'AI SPEAKING' : isListening ? 'LISTENING' : 'READY') : 'IDLE'}
+              {isCallActive ? (isSpeaking ? 'AI SPEAKING' : isListening ? 'LISTENING' : 'CLICK TO SPEAK') : 'IDLE'}
             </span>
           </div>
         </div>
@@ -471,6 +529,7 @@ export default function VoiceAgent() {
           isListening={isListening}
           isSpeaking={isSpeaking}
           isThinking={isThinking}
+          onSendMessage={handleUserMessage}
         />
       </div>
     </div>
