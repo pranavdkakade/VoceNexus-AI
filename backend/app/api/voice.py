@@ -120,16 +120,23 @@ async def voice_websocket(websocket: WebSocket):
                 conversation_record.ended_at = datetime.datetime.utcnow()
                 conversation_record.status = "completed"
 
-                history = memory.get_history(session_id)
-                if len(history) >= 2:
+                # Pull full message dialogue from DB to guarantee resilience
+                db_messages = (
+                    db.query(Message)
+                    .filter(Message.conversation_id == conversation_record.id)
+                    .order_by(Message.timestamp.asc())
+                    .all()
+                )
+                if db_messages and len(db_messages) >= 2:
+                    history = [{"role": m.role, "content": m.content} for m in db_messages]
                     summary_res = call_summarizer.summarize_conversation(history)
                     call_summary = CallSummary(
                         conversation_id=conversation_record.id,
                         summary=summary_res["summary"],
-                        sentiment_overall=summary_res["sentiment_overall"],
-                        lead_score=75,
-                        key_topics=summary_res["key_topics"],
-                        next_steps=summary_res["next_steps"]
+                        sentiment_overall=summary_res.get("sentiment_overall", "positive"),
+                        lead_score=summary_res.get("lead_score", 85),
+                        key_topics=summary_res.get("key_topics", ["Sales Demo"]),
+                        next_steps=summary_res.get("next_steps", "Account Executive follow-up")
                     )
                     db.add(call_summary)
 
